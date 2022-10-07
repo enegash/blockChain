@@ -40,11 +40,12 @@ if __name__ == "__main__":
 	# Then dump string data using dumps() or binary data using dump() to the file and close it.
 	# Private Key that you've loaded you use private_bytes() to serialize the key.
 	savefile = open("save.dat", "wb")
-	pu_ser = pu1.public_bytes(
-		encoding=serialization.Encoding.PEM,
-		format=serialization.PublicFormat.SubjectPublicKeyInfo
-	)
-	pickle.dump(pu_ser, savefile)
+	# Moved loading and serialization to the Signatures Model
+#	pu_ser = pu1.public_bytes(
+#		encoding=serialization.Encoding.PEM,
+#		format=serialization.PublicFormat.SubjectPublicKeyInfo
+#	)
+	pickle.dump(pu1, savefile)
 	#pickle.dump(Tx1.inputs[0][0], savefile)
 	#pickle.dump(Tx1, savefile)
 	savefile.close()
@@ -53,11 +54,11 @@ if __name__ == "__main__":
 	# Will need to use Serialization and de-serialization.
 	loadfile = open("save.dat", "rb")
 	new_pu = pickle.load(loadfile)
-	loaded_pu = serialization.load_pem_public_key(
-		new_pu,
-		backend = default_backend()
-	)
-	print(verify(message, sig, loaded_pu))
+#	loaded_pu = serialization.load_pem_public_key(
+#		new_pu,
+#		backend = default_backend()
+#	)
+	print(verify(message, sig, new_pu))
 	
 	#newTx = pickle.load(loadfile)
 	#print(newTx.is_valid())
