@@ -13,8 +13,11 @@ def generate_keys():
 	)
 
 	public = private.public_key()
-
-	return private, public
+	pu_ser = public.public_bytes(
+		encoding=serialization.Encoding.PEM,
+		format=serialization.PublicFormat.SubjectPublicKeyInfo
+	)
+	return private, pu_ser
 
 
 def sign(message, private):
