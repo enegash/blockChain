@@ -31,35 +31,12 @@ if __name__ == "__main__":
 
 	print(Tx1.is_valid())
 	
-	# Store the BlockChain to the disk.
-	message = b"Some text"
-	sig = sign(message, pr1)
-	print(verify(message,sig,pu1))
+	savefile = open("tx.dat", "wb")
+	pickle.dump(Tx1, savefile)
+	savefile.close()	
 
-	# To pickle first need to create a file, and enable for binary writting. 
-	# Then dump string data using dumps() or binary data using dump() to the file and close it.
-	# Private Key that you've loaded you use private_bytes() to serialize the key.
-	savefile = open("save.dat", "wb")
-	# Moved loading and serialization to the Signatures Model
-#	pu_ser = pu1.public_bytes(
-#		encoding=serialization.Encoding.PEM,
-#		format=serialization.PublicFormat.SubjectPublicKeyInfo
-#	)
-	pickle.dump(pu1, savefile)
-	#pickle.dump(Tx1.inputs[0][0], savefile)
-	#pickle.dump(Tx1, savefile)
-	savefile.close()
+	loadfile = open("tx.dat", "rb")
+	newTx = pickle.load(loadfile)
 
-	# Pickle has trouble with handling the private and public keys. 
-	# Will need to use Serialization and de-serialization.
-	loadfile = open("save.dat", "rb")
-	new_pu = pickle.load(loadfile)
-#	loaded_pu = serialization.load_pem_public_key(
-#		new_pu,
-#		backend = default_backend()
-#	)
-	print(verify(message, sig, new_pu))
-	
-	#newTx = pickle.load(loadfile)
-	#print(newTx.is_valid())
-	
+	print(newTx.is_valid())
+	loadfile.close()	
