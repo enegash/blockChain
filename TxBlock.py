@@ -7,6 +7,8 @@ import pickle
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
+reward = 25.0
+
 class TxBlock (CBlock):
 	
 	def __init__(self, previousBlock):
@@ -16,12 +18,31 @@ class TxBlock (CBlock):
 	def addTx(self, Tx_in):
 		self.data.append(Tx_in)
 
+	# Internal function of the class. Only available inside of the class, private function.
+	def __count_totals(self):
+		total_in = 0
+		total_out = 0
+
+		for tx in self.data:
+			for addr, amt in tx.inputs:
+				total_in += amt
+
+			for addr, amt in tx.outputs:
+				total_out += amt
+
+		return total_in, total_out
+
 	def is_valid(self):
 		if not super(TxBlock, self).is_valid():
 			return False
 		for tx in self.data:
 			if not tx.is_valid():
 				return False
+		
+		total_in, total_out = self.__count_totals()
+		if total_out - total_in - reward > 0.000000000001:
+			return False	
+	
 		return True
 
 
@@ -85,7 +106,7 @@ if __name__ == "__main__":
 
 	load_B1.is_valid()
 
-	print(bytes(str(load_B1.data), 'utf'))
+	# print(bytes(str(load_B1.data), 'utf'))
 
 	for b in [root, B1, load_B1, load_B1.previousBlock]:
 		if b.is_valid():
@@ -120,8 +141,7 @@ if __name__ == "__main__":
 		print("Success! Block reward succeds.")
 	else:
 		print("ERROR! Block reward fail.")
-
-
+	# Test Tx Fees
 	B4 = TxBlock(B3)
 	B4.addTx(Tx2)
 	B4.addTx(Tx3)
