@@ -71,6 +71,27 @@ class Tx:
 		data.append(self.reqd)
 		return data		
 
+	def __repr__(self):
+		reprstr = "INPUTS:"
+		for addr, amt in self.inputs:
+			reprstr = reprstr + str(amt) + " from " + str(addr) + "\n"
+	
+		reprstr = reprstr + "OUTPUTS:\n"
+		for addr, amt in self.outputs:
+			reprstr = reprstr + str(amt) + " from " + str(addr) + "\n"
+			
+		reprstr = reprstr + "REQD:\n"
+		for r in self.reqd:
+			reprstr = reprstr + str(r) + "\n"
+	
+		reprstr = reprstr + "SIGS:\n"
+		for s in self.sigs:
+			reprstr = reprstr + str(s) + "\n"
+
+		reprstr = reprstr + "END\n"
+		
+		return reprstr
+
 
 if __name__ == "__main__":
 

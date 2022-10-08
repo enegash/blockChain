@@ -31,6 +31,11 @@ class CBlock:
 		
 		return digest.finalize()
 
+	def is_valid(self):
+		if self.previousBlock == None:
+			return True
+		return self.previousBlock.computeHash() == self.previousHash
+
 #To ensure we don't run this if we import BlockChain.py
 if __name__ == '__main__':
 	root = CBlock('I am root', None)
