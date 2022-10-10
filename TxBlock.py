@@ -6,11 +6,18 @@ from Transaction import Tx
 import pickle
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
+import random
+import time
+from cryptography.hazmat.primitives import hashes 
 
 reward = 25.0
+leading_zeros = 4
+next_char_limit = 50
 
 class TxBlock (CBlock):
 	
+	nonce = "AAAAAAA"	
+
 	def __init__(self, previousBlock):
 		# Reference to the parent class to use the constructor
 		super(TxBlock, self).__init__([], previousBlock)
@@ -44,6 +51,27 @@ class TxBlock (CBlock):
 			return False	
 	
 		return True
+
+	def good_nonce(self):
+		digest = hashes.Hash(hashes.SHA256(), backend = default_backend)
+		digest.update(bytes(str(self.data), 'utf8'))
+		digest.update(bytes(str(self.previousHash), 'utf'))
+		digest.update(bytes(str(self.nonce), 'utf8'))
+		
+		this_hash = digest.finalize()
+	
+		if this_hash[:leading_zeros] != bytes(''.join(['\x4f' for i in range(leading_zeros)]), 'utf8'):
+			return False
+
+		return int(this_hash[leading_zeros]) < next_char_limit
+
+	def find_nonce(self):
+		for i in range(100000):
+			self.nonce = ''.join([chr(random.randint(0,255)) for i in range(10*leading_zeros)])
+		if self.good_nonce:
+			return self.nonce
+			
+		return None
 
 
 if __name__ == "__main__":
@@ -96,6 +124,16 @@ if __name__ == "__main__":
 	Tx4.sign(pr1)
 	Tx4.sign(pr3)
 	B1.addTx(Tx4)
+	start = time.time()
+	print(B1.find_nonce())
+	elapsed = time.time() - start
+	print("elapsed time: " + str(elapsed) + " s.")
+	if elapsed < 1:
+		print("ERROR! Mining is too fast.")
+	if B1.good_nonce():
+		print("Success! Nonce is good!")
+	else:
+		print("ERROR! Bad nonce.")
 
 	savefile = open("block.dat", "wb")
 	pickle.dump(B1, savefile)
@@ -113,6 +151,11 @@ if __name__ == "__main__":
 			print("Success! Valid block.")
 		else:
 			print("ERROR! Bad block.")
+
+	if B1.good_nonce():
+		print("Success! Nonce is good after save and load!")
+	else:
+		print("ERROR! Bad nonce.")
 
 	B2 = TxBlock(B1)
 	Tx5 = Tx()
@@ -163,7 +206,7 @@ if __name__ == "__main__":
 	Tx8.add_output(pu4, 26.2)
 	B5.addTx(Tx8)
 	if not B5.is_valid():
-		print("Success! Greedy Miner was detected..")
+		print("Success! Greedy Miner was detected.")
 	else:
 		print("ERROR! Greedy Miner was not detected.")
 
