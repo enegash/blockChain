@@ -11,7 +11,7 @@ import time
 from cryptography.hazmat.primitives import hashes 
 
 reward = 25.0
-leading_zeros = 4
+leading_zeros = 10
 next_char_limit = 50
 
 class TxBlock (CBlock):
@@ -66,7 +66,7 @@ class TxBlock (CBlock):
 		return int(this_hash[leading_zeros]) < next_char_limit
 
 	def find_nonce(self):
-		for i in range(100000):
+		for i in range(1000000):
 			self.nonce = ''.join([chr(random.randint(0,255)) for i in range(10*leading_zeros)])
 		if self.good_nonce:
 			return self.nonce
